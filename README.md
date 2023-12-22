@@ -1,2 +1,2 @@
 # MicroService-OCR
-![OCR MS](https://excalidraw.com/#room=8a5d7966519db7f7fd0d,T0F7NosFh1OzeBxjjbAhoQ)
+![schemaOCRmicroservice](https://github.com/Nairod36/MicroService-OCR/assets/72071612/a9e2b296-5814-42b3-8b73-7970a19337b6)

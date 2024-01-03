@@ -4,6 +4,7 @@ import (
     "context"
     "log"
     "time"
+    "saveIMG/models"
 
     "go.mongodb.org/mongo-driver/mongo"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -40,7 +41,7 @@ func NewDBHandler(uri, dbName string) *DBHandler {
 }
 
 // SaveImage stocke une image dans la base de données.
-func (handler *DBHandler) SaveImage(image ImageData) error {
+func (handler *DBHandler) SaveImage(image models.ImageData) error {
     collection := handler.database.Collection("images")
     ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
     _, err := collection.InsertOne(ctx, image)

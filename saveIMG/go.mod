@@ -1,4 +1,4 @@
-module github.com/Nairod36/MicroService-OCR
+module saveIMG
 
 go 1.21.5
 

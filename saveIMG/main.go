@@ -31,7 +31,7 @@ func main() {
         }
 
         // Création de l'objet ImageData
-        imageData := ImageData{
+        imageData := models.ImageData{
             Name: header.Filename,
             Data: fileBytes,
             ContentType: header.Header.Get("Content-Type"),

@@ -3,13 +3,15 @@ package main
 import (
     "github.com/gin-gonic/gin"
     "io/ioutil"
+    "saveIMG/handlers"
+    "saveIMG/models"
 )
 
 func main() {
     router := gin.Default()
 
     // Configuration de la base de données
-    dbHandler := NewDBHandler("mongodb://root:example@localhost:27017", "imageDB")
+    dbHandler := handlers.NewDBHandler("mongodb://root:example@localhost:27017", "imageDB")
 
     // Définir les routes
     router.POST("/upload", func(c *gin.Context) {

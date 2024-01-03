@@ -1,4 +1,4 @@
-package main
+package models
 
 type ImageData struct {
     ID          string `bson:"_id,omitempty"` // Identifiant unique de l'image

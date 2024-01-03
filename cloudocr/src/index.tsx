@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Login from './pages/LoginPage';
 import Register from './pages/RegisterPage';
+import ImageUpload from './pages/ImageUploadPage';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

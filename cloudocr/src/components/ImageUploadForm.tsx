@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
-import { Button, Paper, Box, Typography } from '@mui/material';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+import { Button, Paper, Box, Typography, CircularProgress } from '@mui/material';
+import axios from 'axios';
 
-const ImageUploadForm: React.FC = () => {
+const ImageUploadForm: React.FC<{}> = () => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [uploading, setUploading] = useState<boolean>(false);
+    const [message, setMessage] = useState<string>('');
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setSelectedImage(event.target.files[0]);
+            setMessage(''); // Réinitialiser le message lorsqu'une nouvelle image est sélectionnée
         }
     };
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (selectedImage) {
-            // Logique pour mettre en ligne l'image
-            console.log(selectedImage);
-            // Vous pouvez utiliser FormData pour envoyer l'image au serveur ici
+            setUploading(true);
+            const formData = new FormData();
+            formData.append('image', selectedImage);
+
+            axios.post('http://localhost:8090/image', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            })
+            .then(response => {
+                console.log('Image uploaded successfully', response.data);
+                setMessage('Image mise en ligne avec succès.');
+                setSelectedImage(null); // Réinitialiser l'image sélectionnée
+            })
+            .catch(error => {
+                console.error('Error uploading image', error);
+                setMessage('Erreur lors de la mise en ligne de l\'image.');
+            })
+            .finally(() => {
+                setUploading(false);
+            });
         }
     };
 
@@ -39,12 +61,14 @@ const ImageUploadForm: React.FC = () => {
                         </Button>
                     </label>
                 </Box>
-                {selectedImage && <Box marginBottom={2} style={{ textAlign: 'center' }}>
+                {uploading && <CircularProgress />}
+                {selectedImage && !uploading && <Box marginBottom={2} style={{ textAlign: 'center' }}>
                     {selectedImage.name}
                 </Box>}
-                <Button type="submit" fullWidth variant="contained" color="primary">
+                <Button type="submit" fullWidth variant="contained" color="primary" disabled={uploading}>
                     Mettre en ligne
                 </Button>
+                {message && <Typography style={{ marginTop: '20px', textAlign: 'center' }}>{message}</Typography>}
             </form>
         </Paper>
     );

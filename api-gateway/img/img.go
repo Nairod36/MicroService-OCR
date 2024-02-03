@@ -7,7 +7,7 @@ import (
     "net/http"
 )
 
-func sendImageToStorage(imageData []byte, imageName string) error {
+func SendImageToStorage(imageData []byte, imageName string) error {
     // Création d'une requête multipart/form-data
     body := &bytes.Buffer{}
     writer := multipart.NewWriter(body)

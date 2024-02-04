@@ -10,7 +10,7 @@ import (
 
 func getExtract(imageName string) ([]byte, error) {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s",imageName), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("http://ocr-engine:8010/recognize/%s",imageName), nil)
 	if err != nil {
 		return nil,err
 	} 

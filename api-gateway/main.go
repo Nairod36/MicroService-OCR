@@ -1,9 +1,12 @@
 package main
 
 import (
-    "log"
-    "net/http"
 	"api-gateway/img"
+	"api-gateway/ocr"
+	"encoding/json"
+	"io"
+	"log"
+	"net/http"
 )
 
 func main() {
@@ -46,7 +49,7 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // Envoyer l'image à l'API de stockage
-    err = sendImageToStorage(fileData, header.Filename)
+    err = img.SendImageToStorage(fileData, header.Filename)
     if err != nil {
         http.Error(w, "Erreur lors de l'envoi de l'image à l'API de stockage", http.StatusInternalServerError)
         return
@@ -59,4 +62,26 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 func ocrHandler(w http.ResponseWriter, r *http.Request) {
     // Logique pour OCR
+    if r.Method != "GET" {
+        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+        return
+    }
+    
+    // Récupération du nom de l'image
+    imageName := r.URL.Query().Get("image")
+
+    // Appel de l'API OCR
+    ocrData, err := ocr.GetOCR(imageName)
+    if err != nil {
+        http.Error(w, "Erreur lors de l'appel de l'API OCR", http.StatusInternalServerError)
+        return
+    }
+
+    jsonData, err := json.Marshal(ocrData)
+    if err != nil {
+        http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
+        return
+    }
+
+    w.Write(jsonData)
 }

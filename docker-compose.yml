@@ -1,0 +1,23 @@
+version: '3.5'
+
+services:
+
+  gateway:   
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+      platforms: 
+        - "linux/amd64"
+    ports:
+      - "8090:8090"
+  
+  ocr-engine:   
+    build:
+      context: .
+      dockerfile: ./ocr-engine/Dockerfile
+    env_file:
+      - ./ocr-engine/.env
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./ocr-engine/images:/app/images

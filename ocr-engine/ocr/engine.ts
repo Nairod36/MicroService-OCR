@@ -1,0 +1,27 @@
+import { createWorker} from 'tesseract.js';
+import { IRecognition } from './models';
+
+export class Engine{
+    worker: any;
+    white_list = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+    Setup = async()=>{
+        this.worker = await createWorker('eng')
+        // await this.worker.setParameters({
+        //     tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
+        // });
+    }
+
+    Recognize = async(imagePath:string):Promise<IRecognition>=>{
+        const { data: { text } } = await this.worker.recognize(imagePath);
+        const output:IRecognition = {
+            imagePath,
+            content:text
+        }
+        return output;
+    }
+
+    Terminate = async ()=>{
+        await this.worker.terminate();
+    }
+}

@@ -3,12 +3,8 @@ import { Engine } from "../ocr";
 import { config } from "dotenv";
 import * as fs from 'fs'
 import { ExpressController } from "../api";
+import { IRecognition } from "../ocr/models";
 config()
-
-interface IResult{
-    name:string;
-    text:string;
-}
 
 export class RecognizeController implements ExpressController{  
 
@@ -35,6 +31,8 @@ export class RecognizeController implements ExpressController{
     async getReco(req: Request, res: Response): Promise<void> {
         const path: string = req.params['path'];
         const fullPath: string = `${process.env.IMAGES_PATH}${path}`;
+        console.log(fullPath);
+        
      
         if (!fs.existsSync(fullPath)) {
            res.status(404).send('File not found');
@@ -42,10 +40,9 @@ export class RecognizeController implements ExpressController{
         }
      
         await this.engine.Setup();
-        const result: string = await this.engine.Recognize(fullPath);
+        const result: IRecognition = await this.engine.Recognize(fullPath);
         await this.engine.Terminate();
-        const response: IResult = { name: path, text: result };
-        res.json(response);
+        res.json(result);
      }
 
     buildRoutes(): Router {

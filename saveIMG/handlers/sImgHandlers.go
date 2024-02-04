@@ -24,7 +24,8 @@ func NewDBHandler(uri, dbName string) *DBHandler {
         log.Fatal(err)
     }
 
-    ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
     err = client.Connect(ctx)
     if err != nil {
         log.Fatal(err)
@@ -40,11 +41,15 @@ func NewDBHandler(uri, dbName string) *DBHandler {
     return &DBHandler{client: client, database: db}
 }
 
-// SaveImage stocke une image dans la base de données.
-func (handler *DBHandler) SaveImage(image models.ImageData) error {
+// SaveImagePath sauvegarde le chemin de l'image dans la base de données.
+func (handler *DBHandler) SaveImagePath(image models.ImageData) error {
     collection := handler.database.Collection("images")
-    ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
-    _, err := collection.InsertOne(ctx, image)
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+    _, err := collection.InsertOne(ctx, bson.M{
+        "name":         image.Name,
+        "path":         image.Path, // Sauvegarde du chemin de l'image
+        "contentType":  image.ContentType,
+    })
     return err
 }
-

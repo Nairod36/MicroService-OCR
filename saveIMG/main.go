@@ -1,8 +1,10 @@
 package main
 
 import (
+    "fmt"
     "github.com/gin-gonic/gin"
-    "io/ioutil"
+    "os"
+    "path/filepath"
     "saveIMG/handlers"
     "saveIMG/models"
 )
@@ -23,28 +25,34 @@ func main() {
         }
         defer file.Close()
 
-        // Lecture des données du fichier
-        fileBytes, err := ioutil.ReadAll(file)
-        if err != nil {
+        // Définir le chemin où sauvegarder l'image
+        imagePath := fmt.Sprintf("./img/%s", header.Filename)
+        if err := os.MkdirAll(filepath.Dir(imagePath), os.ModePerm); err != nil {
             c.JSON(500, gin.H{"error": err.Error()})
             return
         }
 
-        // Création de l'objet ImageData
+        // Sauvegarder l'image dans le dossier img
+        if err := c.SaveUploadedFile(file, imagePath); err != nil {
+            c.JSON(500, gin.H{"error": err.Error()})
+            return
+        }
+
+        // Création de l'objet ImageData avec le chemin de l'image
         imageData := models.ImageData{
             Name: header.Filename,
-            Data: fileBytes,
+            Path: imagePath, // Utilisez le chemin de l'image au lieu des données binaires
             ContentType: header.Header.Get("Content-Type"),
         }
 
-        // Sauvegarder l'image dans MongoDB
-        err = dbHandler.SaveImage(imageData)
+        // Sauvegarder le chemin de l'image dans MongoDB
+        err = dbHandler.SaveImagePath(imageData)
         if err != nil {
             c.JSON(500, gin.H{"error": err.Error()})
             return
         }
 
-        c.JSON(200, gin.H{"message": "Image uploaded successfully"})
+        c.JSON(200, gin.H{"message": "Image uploaded and path saved successfully"})
     })
 
     router.Run(":8080")

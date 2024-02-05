@@ -59,3 +59,4 @@ func SendImageToAPI(file multipart.File, header *multipart.FileHeader) error {
 
     return nil
 }
+

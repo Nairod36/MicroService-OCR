@@ -4,10 +4,10 @@ import { config } from "dotenv";
 config()
 let port:number;
 
-if(process.env.PORT === undefined){
+if(process.env.OCR_ENGINE_PORT === undefined){
     port = 3000;
 }else{
-    port = parseInt(process.env.PORT,10)
+    port = parseInt(process.env.OCR_ENGINE_PORT,10)
 }
 
 const api = new APIMaker(port)

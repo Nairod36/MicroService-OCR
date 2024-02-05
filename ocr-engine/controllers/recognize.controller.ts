@@ -34,10 +34,10 @@ export class RecognizeController implements ExpressController{
         console.log(fullPath);
         
      
-        if (!fs.existsSync(fullPath)) {
-           res.status(404).send('File not found');
-           return;
-        }
+        // if (!fs.existsSync(fullPath)) {
+        //    res.status(404).send('File not found');
+        //    return;
+        // }
      
         await this.engine.Setup();
         const result: IRecognition = await this.engine.Recognize(fullPath);

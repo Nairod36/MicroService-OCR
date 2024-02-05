@@ -1,13 +1,24 @@
 package img
 
 import (
-    "bytes"
-    "io"
-    "mime/multipart"
-    "net/http"
+	"bytes"
+	"fmt"
+	"io"
+	"log"
+	"mime/multipart"
+	"net/http"
+	"os"
 )
 
 func SendImageToStorage(imageData []byte, imageName string) error {
+	save_uri,ok := os.LookupEnv("SAVE_IMG_URI")
+	if !ok {
+		log.Fatal("gateway port not found")
+	}
+	save_port,ok := os.LookupEnv("SAVE_IMG_PORT")
+	if !ok {
+		log.Fatal("gateway port not found")
+	}
     // Création d'une requête multipart/form-data
     body := &bytes.Buffer{}
     writer := multipart.NewWriter(body)
@@ -24,7 +35,7 @@ func SendImageToStorage(imageData []byte, imageName string) error {
     writer.Close()
 
     // Envoi de la requête
-    req, err := http.NewRequest("POST", "URL_de_l'API_de_stockage", body)
+    req, err := http.NewRequest("POST", fmt.Sprintf("%s:%s",save_uri,save_port), body)
     if err != nil {
         return err
     }

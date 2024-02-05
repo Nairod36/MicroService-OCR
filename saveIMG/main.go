@@ -1,19 +1,31 @@
 package main
 
 import (
-    "fmt"
-    "github.com/gin-gonic/gin"
-    "os"
-    "path/filepath"
-    "saveIMG/handlers"
-    "saveIMG/models"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"saveIMG/handlers"
+	"saveIMG/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
     router := gin.Default()
 
+    db_uri, ok := os.LookupEnv("DB_URI")
+    if !ok{
+        log.Fatal("DB uri not found")
+    }
+    
+    save_port, ok := os.LookupEnv("SAVE_IMG_PORT")
+    if !ok{
+        log.Fatal("saving port not found")
+    }
+
     // Configuration de la base de données
-    dbHandler := handlers.NewDBHandler("mongodb://root:example@localhost:27017", "imageDB")
+    dbHandler := handlers.NewDBHandler(db_uri, "imageDB")
 
     // Définir les routes
     router.POST("/upload", func(c *gin.Context) {
@@ -26,14 +38,14 @@ func main() {
         defer file.Close()
 
         // Définir le chemin où sauvegarder l'image
-        imagePath := fmt.Sprintf("./img/%s", header.Filename)
+        imagePath := fmt.Sprintf("./images/%s", header.Filename)
         if err := os.MkdirAll(filepath.Dir(imagePath), os.ModePerm); err != nil {
             c.JSON(500, gin.H{"error": err.Error()})
             return
         }
 
         // Sauvegarder l'image dans le dossier img
-        if err := c.SaveUploadedFile(file, imagePath); err != nil {
+        if err := c.SaveUploadedFile(header, imagePath); err != nil {
             c.JSON(500, gin.H{"error": err.Error()})
             return
         }
@@ -54,6 +66,12 @@ func main() {
 
         c.JSON(200, gin.H{"message": "Image uploaded and path saved successfully"})
     })
+    
+    router.GET("/images/:filename", func(c *gin.Context) {
+        filename := c.Param("filename")
+        imagePath := fmt.Sprintf("./images/%s", filename)
+        c.File(imagePath)
+    })
 
-    router.Run(":8080")
+    router.Run(fmt.Sprintf(":%s",save_port))
 }

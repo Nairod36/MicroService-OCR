@@ -8,16 +8,20 @@ services:
       dockerfile: ./api-gateway/Dockerfile
       platforms: 
         - "linux/amd64"
+    env_file:
+      - .env
+    volumes:
+      - "./api-gateway/logs:/logs"
     ports:
-      - "8090:8090"
+      - ${GATEWAY_PORT}:${GATEWAY_PORT}
   
   ocr-engine:   
     build:
       context: .
       dockerfile: ./ocr-engine/Dockerfile
     env_file:
-      - ./ocr-engine/.env
+      - .env
     ports:
-      - ${PORT}:${PORT}
+      - ${OCR_ENGINE_PORT}:${OCR_ENGINE_PORT}
     volumes:
       - ./ocr-engine/images:/app/images

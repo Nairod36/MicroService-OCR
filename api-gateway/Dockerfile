@@ -9,4 +9,5 @@ RUN go build -o /go/gateway/bin/gateway
 
 FROM scratch
 COPY --from=builder /go/gateway/bin/gateway .
+COPY --from=builder /go/gateway/logs ./logs
 CMD ["/gateway"]

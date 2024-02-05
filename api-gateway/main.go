@@ -4,12 +4,26 @@ import (
 	"api-gateway/img"
 	"api-gateway/ocr"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
+	"time"
 )
 
 func main() {
+	gateway_port,ok := os.LookupEnv("GATEWAY_PORT")
+	if !ok {
+		log.Fatal("gateway port not found")
+	}
+	LOG_FILE, err := os.OpenFile(fmt.Sprintf("../logs/%s.log", time.Now().Format("2006-01-02T15:04:05 -07:00:00")), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.SetOutput(LOG_FILE)
+
+	log.Print("Server start...")
 	http.HandleFunc("/auth", authHandler)
     http.HandleFunc("/image", imageUploadHandler)
     http.HandleFunc("/ocr", ocrHandler)
@@ -18,7 +32,7 @@ func main() {
         w.Write([]byte("API Gateway en cours de développement"))
     })
 
-    log.Fatal(http.ListenAndServe(":8090", nil))
+    log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s",gateway_port), nil))
 }
 
 func authHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,6 +42,7 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
     // Assurez-vous que c'est une méthode POST
     if r.Method != "POST" {
+        log.Panic("Méthode non autorisée")
         http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
         return
     }
@@ -36,6 +51,7 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
     r.ParseMultipartForm(10 << 20) // Limite de 10 MB
     file, header, err := r.FormFile("image")
     if err != nil {
+        log.Panic("Méthode non autorisée")
         http.Error(w, "Erreur lors de l'upload de l'image", http.StatusInternalServerError)
         return
     }
@@ -44,6 +60,7 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
     // Lecture de l'image
     fileData, err := io.ReadAll(file)
     if err != nil {
+        log.Panic("Méthode non autorisée")
         http.Error(w, "Erreur lors de la lecture de l'image", http.StatusInternalServerError)
         return
     }
@@ -51,6 +68,7 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
     // Envoyer l'image à l'API de stockage
     err = img.SendImageToStorage(fileData, header.Filename)
     if err != nil {
+        log.Panic("Méthode non autorisée")
         http.Error(w, "Erreur lors de l'envoi de l'image à l'API de stockage", http.StatusInternalServerError)
         return
     }
@@ -63,6 +81,7 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
 func ocrHandler(w http.ResponseWriter, r *http.Request) {
     // Logique pour OCR
     if r.Method != "GET" {
+        log.Panic("Méthode non autorisée")
         http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
         return
     }
@@ -73,15 +92,18 @@ func ocrHandler(w http.ResponseWriter, r *http.Request) {
     // Appel de l'API OCR
     ocrData, err := ocr.GetOCR(imageName)
     if err != nil {
+        log.Panic("Méthode non autorisée")
         http.Error(w, "Erreur lors de l'appel de l'API OCR", http.StatusInternalServerError)
         return
     }
 
     jsonData, err := json.Marshal(ocrData)
     if err != nil {
+        log.Panic("Méthode non autorisée")
         http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
         return
     }
+    log.Print("Extraction complétée")
 
     w.Write(jsonData)
 }

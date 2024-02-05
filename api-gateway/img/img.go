@@ -8,54 +8,67 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"time"
 )
 
 func SendImageToAPI(file multipart.File, header *multipart.FileHeader) error {
-    savePort, ok := os.LookupEnv("SAVE_IMG_PORT")
-    if !ok {
-        log.Fatal("saving port not found")
-    }
-    saveUri, ok := os.LookupEnv("SAVE_IMG_URI")
-    if !ok {
-        log.Fatal("saving port not found")
-    }
+	logFile, err := os.OpenFile(fmt.Sprintf("../../logs/%s.img.log", time.Now().Format("2006-01-02_15-04-05")), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer logFile.Close()
+	log.SetOutput(io.MultiWriter(os.Stdout, logFile))
 
-    // Construire l'URL avec le port dynamique
-    apiURL := fmt.Sprintf("%s:%s/upload",saveUri, savePort)
+	savePort, ok := os.LookupEnv("SAVE_IMG_PORT")
+	if !ok {
+		log.Fatal("saving port not found")
+	}
+	saveUri, ok := os.LookupEnv("SAVE_IMG_URI")
+	if !ok {
+		log.Fatal("saving URI not found")
+	}
 
-    var requestBody bytes.Buffer
-    multiPartWriter := multipart.NewWriter(&requestBody)
+	apiURL := fmt.Sprintf("%s:%s/upload", saveUri, savePort)
 
-    part, err := multiPartWriter.CreateFormFile("image", header.Filename)
-    if err != nil {
-        return err
-    }
-    _, err = io.Copy(part, file)
-    if err != nil {
-        return err
-    }
+	var requestBody bytes.Buffer
+	multiPartWriter := multipart.NewWriter(&requestBody)
 
-    err = multiPartWriter.Close()
-    if err != nil {
-        return err
-    }
+	part, err := multiPartWriter.CreateFormFile("image", header.Filename)
+	if err != nil {
+		log.Panic("Error creating form file: %v", err)
+		return err
+	}
+	_, err = io.Copy(part, file)
+	if err != nil {
+		log.Panic("Error copying file to form file: %v", err)
+		return err
+	}
 
-    req, err := http.NewRequest("POST", apiURL, &requestBody)
-    if err != nil {
-        return err
-    }
-    req.Header.Set("Content-Type", multiPartWriter.FormDataContentType())
+	err = multiPartWriter.Close()
+	if err != nil {
+		log.Panic("Error closing multipart writer: %v", err)
+		return err
+	}
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    if err != nil {
-        return err
-    }
-    defer resp.Body.Close()
+	req, err := http.NewRequest("POST", apiURL, &requestBody)
+	if err != nil {
+		log.Panic("Error creating HTTP request: %v", err)
+		return err
+	}
+	req.Header.Set("Content-Type", multiPartWriter.FormDataContentType())
 
-    if resp.StatusCode != http.StatusOK {
-        return fmt.Errorf("API returned non-OK status: %s", resp.Status)
-    }
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Panic("Error performing HTTP request: %v", err)
+		return err
+	}
+	defer resp.Body.Close()
 
-    return nil
+	if resp.StatusCode != http.StatusOK {
+		log.Panic("API returned non-OK status: %s", resp.Status)
+		return fmt.Errorf("API returned non-OK status: %s", resp.Status)
+	}
+
+	return nil
 }

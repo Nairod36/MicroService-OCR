@@ -12,15 +12,17 @@ import (
 )
 
 func main() {
+
+    logFile, err := os.OpenFile(fmt.Sprintf("../logs/%s.gateway.log", time.Now().Format("2006-01-02_15-04-05")), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+    if err != nil {
+        log.Fatal(err)
+    }
+    log.SetOutput(logFile)
+
 	gateway_port,ok := os.LookupEnv("GATEWAY_PORT")
 	if !ok {
 		log.Fatal("gateway port not found")
 	}
-	LOG_FILE, err := os.OpenFile(fmt.Sprintf("../logs/%s.log", time.Now().Format("2006-01-02T15:04:05 -07:00:00")), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.SetOutput(LOG_FILE)
 
 	log.Print("Server start...")
 	http.HandleFunc("/auth", authHandler)

@@ -5,7 +5,6 @@ import (
 	"api-gateway/ocr"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -52,7 +51,7 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	err = sendImageToAPI(file, header)
+	err = img.SendImageToAPI(file, header)
 	if err != nil {
 		http.Error(w, "Failed to send image to API: "+err.Error(), http.StatusInternalServerError)
 		return

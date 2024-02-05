@@ -40,41 +40,26 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
-    // Assurez-vous que c'est une méthode POST
-    if r.Method != "POST" {
-        log.Panic("Méthode non autorisée")
-        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
-        return
-    }
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
 
-    // Récupération de l'image du corps de la requête
-    r.ParseMultipartForm(10 << 20) // Limite de 10 MB
-    file, header, err := r.FormFile("image")
-    if err != nil {
-        log.Panic("Méthode non autorisée")
-        http.Error(w, "Erreur lors de l'upload de l'image", http.StatusInternalServerError)
-        return
-    }
-    defer file.Close()
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		http.Error(w, "Failed to get image: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
 
-    // Lecture de l'image
-    fileData, err := io.ReadAll(file)
-    if err != nil {
-        log.Panic("Méthode non autorisée")
-        http.Error(w, "Erreur lors de la lecture de l'image", http.StatusInternalServerError)
-        return
-    }
+	err = sendImageToAPI(file, header)
+	if err != nil {
+		http.Error(w, "Failed to send image to API: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-    // Envoyer l'image à l'API de stockage
-    err = img.SendImageToStorage(fileData, header.Filename)
-    if err != nil {
-        log.Panic("Méthode non autorisée")
-        http.Error(w, "Erreur lors de l'envoi de l'image à l'API de stockage", http.StatusInternalServerError)
-        return
-    }
-
-    // Répondre avec succès
-    w.Write([]byte("Image téléchargée avec succès"))
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Image uploaded successfully"))
 }
 
 

@@ -40,6 +40,7 @@ func main() {
         defer file.Close()
 
         // Définir le chemin où sauvegarder l'image
+        var trueName string = header.Filename
         imagePath := fmt.Sprintf("./images/%s", header.Filename)
         if err := os.MkdirAll(filepath.Dir(imagePath), os.ModePerm); err != nil {
             c.JSON(500, gin.H{"error": err.Error()})
@@ -55,7 +56,7 @@ func main() {
         // Création de l'objet ImageData avec le chemin de l'image
         imageData := models.ImageData{
             Name: header.Filename,
-            Path: imagePath, // Utilisez le chemin de l'image au lieu des données binaires
+            Path: trueName, // Utilisez le chemin de l'image au lieu des données binaires
             ContentType: header.Header.Get("Content-Type"),
         }
 

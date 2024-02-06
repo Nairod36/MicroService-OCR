@@ -1,5 +1,5 @@
 import { APIMaker } from "./api";
-import { RecognizeController } from "./controllers";
+import { RecognizeController, RecognizeFromIdController } from "./controllers";
 import { config } from "dotenv";
 config()
 let port:number;
@@ -11,5 +11,5 @@ if(process.env.OCR_ENGINE_PORT === undefined){
 }
 
 const api = new APIMaker(port)
-api.SetupControllers([RecognizeController.getInstance()])
+api.SetupControllers([RecognizeController.getInstance(),RecognizeFromIdController.getInstance()])
 api.LaunchAPI()

@@ -1,5 +1,5 @@
 import express,{Express} from "express";
-const prometheus = require('express-prometheus-middleware');
+// const prometheus = require('express-prometheus-middleware');
 import { ExpressController } from "./ExpressController.interface";
 
 export class APIMaker{
@@ -20,7 +20,7 @@ export class APIMaker{
     private _buildRoutes = ():void=>{
         for(let controller of this.controllers){
             const router = controller.buildRoutes()
-            this.app.use('/metrics', prometheus({ metricsPath: '/metrics', collectDefaultMetrics: true }));
+            // this.app.use('/metrics', prometheus({ metricsPath: '/metrics', collectDefaultMetrics: true }));
             this.app.use(controller.path,router)
         }
     }

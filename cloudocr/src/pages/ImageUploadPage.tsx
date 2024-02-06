@@ -1,5 +1,6 @@
 import React from 'react';
 import ImageUploadForm from '../components/ImageUploadForm';
+import UserImages from '../components/oldImagData';
 import { Button, Container, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; // Importer useNavigate
 
@@ -20,6 +21,7 @@ const ImageUploadPage: React.FC = () => {
             </Box>
             <Box style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%' }}>
                 <ImageUploadForm />
+                <UserImages />
             </Box>
         </Container>
     );

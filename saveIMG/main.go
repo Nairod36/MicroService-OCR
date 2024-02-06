@@ -55,6 +55,7 @@ func main() {
 
         // Création de l'objet ImageData avec le chemin de l'image
         imageData := models.ImageData{
+            Iduser: header.IdUser,
             Name: header.Filename,
             Path: trueName, // Utilisez le chemin de l'image au lieu des données binaires
             ContentType: header.Header.Get("Content-Type"),
@@ -90,6 +91,21 @@ func main() {
         }
     
         c.JSON(http.StatusOK, image)
+    })
+
+    router.GET("/images/user/:userId", func(c *gin.Context) {
+        userId := c.Param("userId") 
+        images, err := dbHandler.FindAllImagesByIdUser(userId)
+        if err != nil {
+            if err == mongo.ErrNoDocuments {
+                c.JSON(http.StatusNotFound, gin.H{"error": "No images found for the given user ID"})
+            } else {
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            }
+            return
+        }
+
+        c.JSON(http.StatusOK, images)
     })
     
     router.PATCH("/image/:id", func(c *gin.Context) {

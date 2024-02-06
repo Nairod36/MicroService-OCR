@@ -50,6 +50,7 @@ func (handler *DBHandler) SaveImagePath(image models.ImageData) (string, error) 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	result, err := collection.InsertOne(ctx, bson.M{
+		"idUser":       image.idUser, // Remplacez par l'ID de l'utilisateur
 		"name":         image.Name,
 		"path":         image.Path,
 		"contentType":  image.ContentType,
@@ -79,6 +80,38 @@ func (handler *DBHandler) FindImageByID(id string) (*models.ImageData, error) {
 	}
 
 	return &image, nil
+}
+
+func (handler *DBHandler) FindAllImagesByIdUser(idUser string) ([]models.ImageData, error) {
+	var images []models.ImageData
+	collection := handler.database.Collection("images")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// Convertir l'ID utilisateur en un type approprié si nécessaire (par exemple, ObjectID pour MongoDB)
+	formattedIdUser, _ := primitive.ObjectIDFromHex(idUser)
+
+	// Utiliser bson.M pour filtrer les documents par idUser
+	cursor, err := collection.Find(ctx, bson.M{"idUser": formattedIdUser})
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	for cursor.Next(ctx) {
+		var image models.ImageData
+		err := cursor.Decode(&image)
+		if err != nil {
+			return nil, err
+		}
+		images = append(images, image)
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return images, nil
 }
 
 func (handler *DBHandler) UpdateImage(id string, updateData models.ImageData) error {

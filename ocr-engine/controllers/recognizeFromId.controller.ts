@@ -39,8 +39,8 @@ export class RecognizeFromIdController implements ExpressController{
         
      
         await this.engine.Setup();
-        const result: IRecognition = await this.engine.Recognize(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/images/test.png`);
-        // const result: IRecognition = await this.engine.Recognize(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/images/${file.Path}`);
+        // const result: IRecognition = await this.engine.Recognize(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/images/test.png`);
+        const result: IRecognition = await this.engine.Recognize(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/images/${file.Path}`);
         file.ExctractData = result.content;
         const response2 = await axios.patch(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/image/${id}`,file)
         await this.engine.Terminate();

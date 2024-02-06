@@ -124,7 +124,8 @@ func (handler *DBHandler) UpdateImage(id string, updateData models.ImageData) er
 			"name":         updateData.Name,
 			"path":         updateData.Path,
 			"contentType":  updateData.ContentType,
-			"extract_data": updateData.ExctractData,
+			"fulltext": 	updateData.Fulltext,
+			"recognition": 	updateData.Recognition,
 		},
 	}
 	formattedId, _ := primitive.ObjectIDFromHex(id)

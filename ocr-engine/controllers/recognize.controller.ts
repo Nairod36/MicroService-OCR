@@ -3,7 +3,8 @@ import { Engine } from "../ocr";
 import { config } from "dotenv";
 import * as fs from 'fs'
 import { ExpressController } from "../api";
-import { IRecognition } from "../ocr/models";
+import { IComplexRecognition, IRecognition } from "../ocr/models";
+import { IInput } from "../models";
 config()
 
 export class RecognizeController implements ExpressController{  
@@ -32,23 +33,46 @@ export class RecognizeController implements ExpressController{
         const path: string = req.params['path'];
         const fullPath: string = `${process.env.REACT_APP_SAVE_IMG_URI}:${process.env.REACT_APP_SAVE_IMG_PORT}/images/${path}`;
         console.log(fullPath);
-        
-     
-        // if (!fs.existsSync(fullPath)) {
-        //    res.status(404).send('File not found');
-        //    return;
-        // }
      
         await this.engine.Setup();
         const result: IRecognition = await this.engine.Recognize(fullPath);
         await this.engine.Terminate();
         res.json(result);
-     }
+    }   
+    
+    async getRecoComplex(req: Request, res: Response): Promise<void> {  
+        const path: string = req.params['path'];
+        const fullPath: string = `${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/image/${path}`;
+        console.log(fullPath);
+        const input:IInput = req.body
+
+        const result:IComplexRecognition[] = []
+
+        await this.engine.Setup();
+        
+        for (let i = 0; i < input.inputs.length; i++) {
+            const entry: IRecognition = await this.engine.RecognizeComplex(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/images/${path}`, input.inputs[i].rectangle);
+            const name = input.inputs[i].name
+            result.push({
+                [name]:{
+                    value:entry.content,
+                    top:input.inputs[i].rectangle.top,
+                    left:input.inputs[i].rectangle.left,
+                    width:input.inputs[i].rectangle.width,
+                    height:input.inputs[i].rectangle.height
+                }
+            });
+        }
+        await this.engine.Terminate();
+        
+        res.json(result)
+    }  
 
     buildRoutes(): Router {
         const router = express.Router();        
         router.get('/', this.getBasic.bind(this));
         router.get('/:path', this.getReco.bind(this));
+        router.post('/:path',express.json(), this.getRecoComplex.bind(this));
         return router;
     }
 }

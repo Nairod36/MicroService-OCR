@@ -1,6 +1,7 @@
 import { APIMaker } from "./api";
 import { RecognizeController, RecognizeFromIdController } from "./controllers";
 import { config } from "dotenv";
+import { IComplexRecognition } from "./ocr/models";
 config()
 let port:number;
 

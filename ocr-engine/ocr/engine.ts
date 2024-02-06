@@ -1,5 +1,6 @@
 import { createWorker} from 'tesseract.js';
 import { IRecognition } from './models';
+import { IRectangle } from '../models';
 
 export class Engine{
     worker: any;
@@ -14,6 +15,17 @@ export class Engine{
 
     Recognize = async(imagePath:string):Promise<IRecognition>=>{
         const { data: { text } } = await this.worker.recognize(imagePath);
+        const output:IRecognition = {
+            imagePath,
+            content:text
+        }
+        return output;
+    }
+
+    RecognizeComplex = async(imagePath:string,rectangle:IRectangle):Promise<IRecognition>=>{
+        const { data: { text } } = await this.worker.recognize(imagePath,{rectangle:rectangle});
+        console.log(text);
+        
         const output:IRecognition = {
             imagePath,
             content:text

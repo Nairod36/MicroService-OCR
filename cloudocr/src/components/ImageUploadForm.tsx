@@ -4,12 +4,15 @@ import axios from 'axios';
 
 const ImageUploadForm: React.FC<{}> = () => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null); // Ajout pour stocker l'URL de prévisualisation de l'image
     const [uploading, setUploading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>('');
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
-            setSelectedImage(event.target.files[0]);
+            const file = event.target.files[0];
+            setSelectedImage(file);
+            setImagePreviewUrl(URL.createObjectURL(file)); // Créer et stocker l'URL pour la prévisualisation
             setMessage(''); // Réinitialiser le message lorsqu'une nouvelle image est sélectionnée
         }
     };
@@ -30,6 +33,7 @@ const ImageUploadForm: React.FC<{}> = () => {
                 console.log('Image uploaded successfully', response.data);
                 setMessage('Image mise en ligne avec succès.');
                 setSelectedImage(null); // Réinitialiser l'image sélectionnée
+                setImagePreviewUrl(null); // Réinitialiser l'URL de prévisualisation
             })
             .catch(error => {
                 console.error('Error uploading image', error);
@@ -62,8 +66,9 @@ const ImageUploadForm: React.FC<{}> = () => {
                     </label>
                 </Box>
                 {uploading && <CircularProgress />}
-                {selectedImage && !uploading && <Box marginBottom={2} style={{ textAlign: 'center' }}>
-                    {selectedImage.name}
+                {imagePreviewUrl && !uploading && <Box marginBottom={2} textAlign="center">
+                    <img src={imagePreviewUrl} alt="Aperçu" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+                    <div>{selectedImage?.name}</div>
                 </Box>}
                 <Button type="submit" fullWidth variant="contained" color="primary" disabled={uploading}>
                     Mettre en ligne

@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
 import { TextField, Button, Paper, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         // Logique de connexion ici
         console.log(email, password);
+
+        // Après la connexion, rediriger vers la page d'upload
+        navigate('/upload');
+    };
+
+    const handleRegisterRedirect = () => {
+        navigate('/register'); 
     };
 
     return (
@@ -40,6 +51,14 @@ const LoginForm: React.FC = () => {
                     Se connecter
                 </Button>
             </form>
+            <Box marginTop={2} marginBottom={2}>
+                <Typography variant="body2" style={{ textAlign: 'center' }}>
+                    Pas de compte ?
+                </Typography>
+            </Box>
+            <Button onClick={handleRegisterRedirect} fullWidth variant="outlined" color="primary">
+                S'inscrire
+            </Button>
         </Paper>
     );
 };

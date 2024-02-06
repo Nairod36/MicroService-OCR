@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Étape 1
 import { TextField, Button, Paper, Box, Typography } from '@mui/material';
 
 const RegisterForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const navigate = useNavigate(); // Étape 2
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         // Logique d'inscription ici
         console.log(email, password, confirmPassword);
+
+        // Après l'inscription, rediriger vers la page de connexion
+        navigate('/'); // Étape 3, remplacez '/' par le chemin de votre page de connexion si nécessaire
     };
 
     return (

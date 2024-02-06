@@ -2,9 +2,20 @@ package models
 
 // ImageData représente les métadonnées d'une image, y compris son chemin d'accès.
 type ImageData struct {
-    ID           string `bson:"_id,omitempty"` // Identifiant unique de l'image
-    Name         string `bson:"name"`          // Nom de l'image
-    Path         string `bson:"path"`          // Chemin d'accès au fichier de l'image sur le serveur
-    ContentType  string `bson:"content_type"`  // Type de contenu (par exemple, "image/png")
-    ExctractData string `bson:"extract_data"`  // Texte extrait de l'image
+    ID           string `bson:"_id,omitempty"`
+    Name         string `bson:"name"`
+    Path         string `bson:"path"`
+    ContentType  string `bson:"content_type"`
+    Fulltext     string `bson:"fulltext"`
+    Recognition []IComplexRecognition `bson:"recognition"`
+}
+
+type IComplexRecognition map[string]IComplexElement
+
+type IComplexElement struct {
+    Value  string `bson:"value"`
+    Left   int    `bson:"left"`
+    Top    int    `bson:"top"`
+    Width  int    `bson:"width"`
+    Height int    `bson:"height"`
 }

@@ -47,5 +47,14 @@ services:
     volumes:
       - ./saveIMG/images:/images
 
+  auth-user:
+    build:
+      context: .
+      dockerfile: ./auth/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - ${AUTH_USER_PORT}:${AUTH_USER_PORT}
+
 volumes:
   mongodb_data:

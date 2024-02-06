@@ -18,25 +18,25 @@ const RegisterForm: React.FC = () => {
             return;
         }
 
-        const apiUrl = `${process.env.REACT_APP_AUTH_USER_URI}:${process.env.REACT_APP_AUTH_USER_PORT}/register`; // Utilisez vos variables d'environnement
+        // const apiUrl = `${process.env.REACT_APP_AUTH_USER_URI}:${process.env.REACT_APP_AUTH_USER_PORT}/register`; // Utilisez vos variables d'environnement
 
-        try {
-            // Envoyer la requête d'inscription à l'API
-            const response = await axios.post(apiUrl, {
-                email: email,
-                password: password
-            });
+        // try {
+        //     // Envoyer la requête d'inscription à l'API
+        //     const response = await axios.post(apiUrl, {
+        //         email: email,
+        //         password: password
+        //     });
 
-            console.log(response.data); // Traiter la réponse de l'API
+        //     console.log(response.data); // Traiter la réponse de l'API
 
             // Après l'inscription réussie, rediriger vers la page de connexion
-            navigate('/login'); 
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.error('Erreur lors de l\'inscription', error.response?.data || error.message);
-            } else {
-                console.error('Une erreur inattendue est survenue', error);
-                }    }
+            navigate('/'); 
+        // } catch (error) {
+        //     if (axios.isAxiosError(error)) {
+        //         console.error('Erreur lors de l\'inscription', error.response?.data || error.message);
+        //     } else {
+        //         console.error('Une erreur inattendue est survenue', error);
+        //         }    }
     };
 
     return (

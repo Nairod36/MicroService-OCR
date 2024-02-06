@@ -32,17 +32,17 @@ export class RecognizeFromIdController implements ExpressController{
     
     async getReco(req: Request, res: Response): Promise<void> {
         const id: string = req.params['id'];
-        const fullPath: string = `${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/image/${id}`;
+        const fullPath: string = `${process.env.REACT_APP_SAVE_IMG_URI}:${process.env.REACT_APP_SAVE_IMG_PORT}/image/${id}`;
         console.log(fullPath);
         const response = await axios.get(fullPath)
         const file:IFile = response.data
         
      
         await this.engine.Setup();
-        // const result: IRecognition = await this.engine.Recognize(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/images/test.png`);
-        const result: IRecognition = await this.engine.Recognize(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/images/${file.Path}`);
+        // const result: IRecognition = await this.engine.Recognize(`${process.env.REACT_APP_SAVE_IMG_URI}:${process.env.REACT_APP_SAVE_IMG_PORT}/images/test.png`);
+        const result: IRecognition = await this.engine.Recognize(`${process.env.REACT_APP_SAVE_IMG_URI}:${process.env.REACT_APP_SAVE_IMG_PORT}/images/${file.Path}`);
         file.ExctractData = result.content;
-        const response2 = await axios.patch(`${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/image/${id}`,file)
+        const response2 = await axios.patch(`${process.env.REACT_APP_SAVE_IMG_URI}:${process.env.REACT_APP_SAVE_IMG_PORT}/image/${id}`,file)
         await this.engine.Terminate();
         
         res.json(response.data)

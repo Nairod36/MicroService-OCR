@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TextField, Button, Paper, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 
 const LoginForm: React.FC = () => {
@@ -9,15 +10,29 @@ const LoginForm: React.FC = () => {
     const navigate = useNavigate();
 
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Logique de connexion ici
-        console.log(email, password);
 
-        // Après la connexion, rediriger vers la page d'upload
-        navigate('/upload');
+        const uri = process.env.REACT_APP_AUTH_USER_URI;
+        const port = process.env.REACT_APP_AUTH_USER_PORT;
+        const apiUrl = `${uri}:${port}/login`;
+
+        try {
+            const response = await axios.post(apiUrl, {
+                email: email,
+                password: password
+            });
+
+            console.log(response.data); // Traiter la réponse de l'API
+
+            // Si la connexion est réussie, rediriger vers la page d'upload
+            navigate('/upload');
+        } catch (error) {
+            console.error('Erreur lors de la connexion', error);
+            // Gérer l'erreur de connexion ici
+        }
     };
-
+    
     const handleRegisterRedirect = () => {
         navigate('/register'); 
     };

@@ -16,18 +16,18 @@ import (
 func main() {
     router := gin.Default()
 
-    db_uri, ok := os.LookupEnv("DB_URI")
+    REACT_APP_DB_URI, ok := os.LookupEnv("REACT_APP_DB_URI")
     if !ok{
         log.Fatal("DB uri not found")
     }
     
-    save_port, ok := os.LookupEnv("SAVE_IMG_PORT")
+    save_port, ok := os.LookupEnv("REACT_APP_SAVE_IMG_PORT")
     if !ok{
         log.Fatal("saving port not found")
     }
 
     // Configuration de la base de données
-    dbHandler := handlers.NewDBHandler(db_uri, "imageDB")
+    dbHandler := handlers.NewDBHandler(REACT_APP_DB_URI, "imageDB")
 
     // Définir les routes
     router.POST("/upload", func(c *gin.Context) {

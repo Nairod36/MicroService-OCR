@@ -19,7 +19,7 @@ func main() {
     }
     log.SetOutput(logFile)
 
-	gateway_port,ok := os.LookupEnv("GATEWAY_PORT")
+	REACT_APP_GATEWAY_PORT,ok := os.LookupEnv("REACT_APP_GATEWAY_PORT")
 	if !ok {
 		log.Fatal("gateway port not found")
 	}
@@ -33,7 +33,7 @@ func main() {
         w.Write([]byte("API Gateway en cours de développement"))
     })
 
-    log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s",gateway_port), nil))
+    log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s",REACT_APP_GATEWAY_PORT), nil))
 }
 
 func authHandler(w http.ResponseWriter, r *http.Request) {

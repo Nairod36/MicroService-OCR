@@ -12,6 +12,7 @@ import (
 )
 
 func SendImageToAPI(file multipart.File, header *multipart.FileHeader) error {
+
 	logFile, err := os.OpenFile(fmt.Sprintf("../../logs/%s.img.log", time.Now().Format("2006-01-02_15-04-05")), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
 		log.Fatal(err)

@@ -73,5 +73,37 @@ func main() {
         c.File(imagePath)
     })
 
+    router.GET("/image/:id", func(c *gin.Context) {
+        id := c.Param("id")
+        image, err := dbHandler.FindImageByID(id)
+        if err != nil {
+            if err == mongo.ErrNoDocuments {
+                c.JSON(http.StatusNotFound, gin.H{"error": "Image not found"})
+            } else {
+                c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            }
+            return
+        }
+    
+        c.JSON(http.StatusOK, image)
+    })
+    
+    router.PATCH("/image/:id", func(c *gin.Context) {
+        id := c.Param("id")
+        
+        var updateData models.ImageData
+        if err := c.ShouldBindJSON(&updateData); err != nil {
+            c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+            return
+        }
+
+        if err := dbHandler.UpdateImage(id, updateData); err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+            return
+        }
+
+        c.JSON(http.StatusOK, gin.H{"message": "Image updated successfully"})
+    })
+
     router.Run(fmt.Sprintf(":%s",save_port))
 }

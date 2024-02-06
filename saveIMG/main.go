@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"saveIMG/handlers"
 	"saveIMG/models"
+	"go.mongodb.org/mongo-driver/mongo"
+    "net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,15 +60,16 @@ func main() {
         }
 
         // Sauvegarder le chemin de l'image dans MongoDB
-        err = dbHandler.SaveImagePath(imageData)
+        var insertedID string
+        insertedID, err = dbHandler.SaveImagePath(imageData)
         if err != nil {
             c.JSON(500, gin.H{"error": err.Error()})
             return
         }
 
-        c.JSON(200, gin.H{"message": "Image uploaded and path saved successfully"})
+        c.JSON(200, gin.H{"message": "Image uploaded and path saved successfully","ID":insertedID})
     })
-    
+
     router.GET("/images/:filename", func(c *gin.Context) {
         filename := c.Param("filename")
         imagePath := fmt.Sprintf("./images/%s", filename)

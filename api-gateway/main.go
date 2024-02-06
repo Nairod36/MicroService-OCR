@@ -53,7 +53,7 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	err = img.SendImageToAPI(file, header)
+	_,err = img.SendImageToAPI(file, header)
 	if err != nil {
 		http.Error(w, "Failed to send image to API: "+err.Error(), http.StatusInternalServerError)
 		return

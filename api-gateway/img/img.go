@@ -1,7 +1,9 @@
 package img
 
 import (
+	"api-gateway/img/models"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -11,7 +13,7 @@ import (
 	"time"
 )
 
-func SendImageToAPI(file multipart.File, header *multipart.FileHeader) error {
+func SendImageToAPI(file multipart.File, header *multipart.FileHeader) (string,error) {
 
 	logFile, err := os.OpenFile(fmt.Sprintf("../../logs/%s.img.log", time.Now().Format("2006-01-02_15-04-05")), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
@@ -37,24 +39,24 @@ func SendImageToAPI(file multipart.File, header *multipart.FileHeader) error {
 	part, err := multiPartWriter.CreateFormFile("image", header.Filename)
 	if err != nil {
 		log.Panic("Error creating form file: %v", err)
-		return err
+		return "",err
 	}
 	_, err = io.Copy(part, file)
 	if err != nil {
 		log.Panic("Error copying file to form file: %v", err)
-		return err
+		return "",err
 	}
 
 	err = multiPartWriter.Close()
 	if err != nil {
 		log.Panic("Error closing multipart writer: %v", err)
-		return err
+		return "",err
 	}
 
 	req, err := http.NewRequest("POST", apiURL, &requestBody)
 	if err != nil {
 		log.Panic("Error creating HTTP request: %v", err)
-		return err
+		return "",err
 	}
 	req.Header.Set("Content-Type", multiPartWriter.FormDataContentType())
 
@@ -62,14 +64,29 @@ func SendImageToAPI(file multipart.File, header *multipart.FileHeader) error {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Panic("Error performing HTTP request: %v", err)
-		return err
+		return "",err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		log.Panic("API returned non-OK status: %s", resp.Status)
-		return fmt.Errorf("API returned non-OK status: %s", resp.Status)
+		return "",fmt.Errorf("API returned non-OK status: %s", resp.Status)
 	}
 
-	return nil
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Panic("Error during request: ", err)
+		return "",nil
+	}
+    responseIMG,_:=parseResponse(body)
+    log.Printf("Message : %s",responseIMG.Message)
+    log.Printf("Id : %s",responseIMG.Id)
+
+	return responseIMG.Id,nil
+}
+
+func parseResponse(response []byte) (models.IResponseIMG, error) {
+	var output models.IResponseIMG
+	err := json.Unmarshal(response, &output)
+	return output, err
 }

@@ -1,15 +1,42 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Paper, Box, Typography } from '@mui/material';
+import axios from 'axios'; // Assurez-vous qu'Axios est importé
 
 const RegisterForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Logique d'inscription ici
-        console.log(email, password, confirmPassword);
+
+        // Vérifiez que les mots de passe correspondent
+        if (password !== confirmPassword) {
+            alert("Les mots de passe ne correspondent pas.");
+            return;
+        }
+
+        // const apiUrl = `${process.env.REACT_APP_AUTH_USER_URI}:${process.env.REACT_APP_AUTH_USER_PORT}/register`; // Utilisez vos variables d'environnement
+
+        // try {
+        //     // Envoyer la requête d'inscription à l'API
+        //     const response = await axios.post(apiUrl, {
+        //         email: email,
+        //         password: password
+        //     });
+
+        //     console.log(response.data); // Traiter la réponse de l'API
+
+            // Après l'inscription réussie, rediriger vers la page de connexion
+            navigate('/'); 
+        // } catch (error) {
+        //     if (axios.isAxiosError(error)) {
+        //         console.error('Erreur lors de l\'inscription', error.response?.data || error.message);
+        //     } else {
+        //         console.error('Une erreur inattendue est survenue', error);
+        //         }    }
     };
 
     return (
@@ -53,6 +80,6 @@ const RegisterForm: React.FC = () => {
             </form>
         </Paper>
     );
-};
+    };
 
 export default RegisterForm;

@@ -22,11 +22,11 @@ func SendImageToAPI(file multipart.File, header *multipart.FileHeader) (string,e
 	defer logFile.Close()
 	log.SetOutput(io.MultiWriter(os.Stdout, logFile))
 
-	savePort, ok := os.LookupEnv("SAVE_IMG_PORT")
+	savePort, ok := os.LookupEnv("REACT_APP_SAVE_IMG_PORT")
 	if !ok {
 		log.Fatal("saving port not found")
 	}
-	saveUri, ok := os.LookupEnv("SAVE_IMG_URI")
+	saveUri, ok := os.LookupEnv("REACT_APP_SAVE_IMG_URI")
 	if !ok {
 		log.Fatal("saving URI not found")
 	}

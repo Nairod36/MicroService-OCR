@@ -31,7 +31,7 @@ export class RecognizeController implements ExpressController{
     
     async getReco(req: Request, res: Response): Promise<void> {
         const path: string = req.params['path'];
-        const fullPath: string = `${process.env.SAVE_IMG_URI}:${process.env.SAVE_IMG_PORT}/images/${path}`;
+        const fullPath: string = `${process.env.REACT_APP_SAVE_IMG_URI}:${process.env.REACT_APP_SAVE_IMG_PORT}/images/${path}`;
         console.log(fullPath);
      
         await this.engine.Setup();

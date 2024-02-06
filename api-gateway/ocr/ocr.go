@@ -19,11 +19,11 @@ func getExtract(imageName string) ([]byte, error) {
     }
     log.SetOutput(logFile)
 
-	ocrURI, ok := os.LookupEnv("OCR_ENGINE_URI")
+	ocrURI, ok := os.LookupEnv("REACT_APP_OCR_ENGINE_URI")
 	if !ok {
 		log.Fatal("OCR engine URI not found")
 	}
-	ocrPort, ok := os.LookupEnv("OCR_ENGINE_PORT")
+	ocrPort, ok := os.LookupEnv("REACT_APP_OCR_ENGINE_PORT")
 	if !ok {
 		log.Fatal("OCR engine port not found")
 	}
@@ -59,11 +59,11 @@ func getExtractFromId(id string) ([]byte, error) {
     }
     log.SetOutput(logFile)
 
-	ocrURI, ok := os.LookupEnv("OCR_ENGINE_URI")
+	ocrURI, ok := os.LookupEnv("REACT_APP_OCR_ENGINE_URI")
 	if !ok {
 		log.Fatal("OCR engine URI not found")
 	}
-	ocrPort, ok := os.LookupEnv("OCR_ENGINE_PORT")
+	ocrPort, ok := os.LookupEnv("REACT_APP_OCR_ENGINE_PORT")
 	if !ok {
 		log.Fatal("OCR engine port not found")
 	}

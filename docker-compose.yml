@@ -13,7 +13,7 @@ services:
     volumes:
       - "./api-gateway/logs:/logs"
     ports:
-      - ${GATEWAY_PORT}:${GATEWAY_PORT}
+      - ${REACT_APP_GATEWAY_PORT}:${REACT_APP_GATEWAY_PORT}
   
   ocr-engine:   
     build:
@@ -22,7 +22,7 @@ services:
     env_file:
       - .env
     ports:
-      - ${OCR_ENGINE_PORT}:${OCR_ENGINE_PORT}
+      - ${REACT_APP_OCR_ENGINE_PORT}:${REACT_APP_OCR_ENGINE_PORT}
     volumes:
       - ./ocr-engine/images:/app/images
 
@@ -31,8 +31,8 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_SECRET}
+      MONGO_INITDB_ROOT_USERNAME: ${REACT_APP_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${REACT_APP_DB_SECRET}
     volumes:
       - mongodb_data:/data/db
   
@@ -43,9 +43,18 @@ services:
     env_file:
       - .env
     ports:
-      - ${SAVE_IMG_PORT}:${SAVE_IMG_PORT}
+      - ${REACT_APP_SAVE_IMG_PORT}:${REACT_APP_SAVE_IMG_PORT}
     volumes:
       - ./saveIMG/images:/images
+
+  auth-user:
+    build:
+      context: .
+      dockerfile: ./auth/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - ${REACT_APP_AUTH_USER_PORT}:${REACT_APP_AUTH_USER_PORT}
 
 volumes:
   mongodb_data:

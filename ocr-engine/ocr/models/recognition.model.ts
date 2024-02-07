@@ -1,6 +1,6 @@
 export interface IRecognition{
     imagePath:string;
-    content:string;
+    fulltext:string;
 }
 export interface IRecognitionResult{
     recognition:IComplexRecognition[]

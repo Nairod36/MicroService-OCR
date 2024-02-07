@@ -50,11 +50,10 @@ func (handler *DBHandler) SaveImagePath(image models.ImageData) (string, error) 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	result, err := collection.InsertOne(ctx, bson.M{
-		"idUser":       image.idUser, // Remplacez par l'ID de l'utilisateur
+		"idUser":       image.UserId, // Remplacez par l'ID de l'utilisateur
 		"name":         image.Name,
 		"path":         image.Path,
 		"contentType":  image.ContentType,
-		"extract_data": "",
 	})
 	if err != nil {
 		return "", err

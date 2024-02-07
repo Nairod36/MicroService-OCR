@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func SendImageToAPI(file multipart.File, header *multipart.FileHeader) (string,error) {
+func SendImageToAPI(file multipart.File, userId string, header *multipart.FileHeader) (string,error) {
 
 	logFile, err := os.OpenFile(fmt.Sprintf("../../logs/%s.img.log", time.Now().Format("2006-01-02_15-04-05")), os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
@@ -46,6 +46,12 @@ func SendImageToAPI(file multipart.File, header *multipart.FileHeader) (string,e
 		log.Panic("Error copying file to form file: %v", err)
 		return "",err
 	}
+	part2,err := multiPartWriter.CreateFormField("userId")
+	if err != nil {
+		log.Panic("Error creating form field: %v", err)
+		return "",err
+	}
+	part2.Write([]byte(userId))
 
 	err = multiPartWriter.Close()
 	if err != nil {

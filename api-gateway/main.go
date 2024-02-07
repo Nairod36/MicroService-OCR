@@ -3,8 +3,10 @@ package main
 import (
 	"api-gateway/img"
 	"api-gateway/ocr"
+	"api-gateway/ocr/models"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -41,10 +43,6 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
-		return
-	}
 
 	file, header, err := r.FormFile("image")
 	if err != nil {
@@ -53,7 +51,9 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	_,err = img.SendImageToAPI(file, header)
+    userId := r.FormValue("userId")
+
+	_,err = img.SendImageToAPI(file, userId, header)
 	if err != nil {
 		http.Error(w, "Failed to send image to API: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -66,30 +66,100 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
 
 func ocrHandler(w http.ResponseWriter, r *http.Request) {
     // Logique pour OCR
-    if r.Method != "GET" {
-        log.Panic("Méthode non autorisée")
-        http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
-        return
-    }
+    if r.Method == "GET" {
+        // Récupération de l'id de l'image
+        imageId := r.URL.Query().Get("id")
+        // Récupération du nom de l'image
+        imageName := r.URL.Query().Get("image")
     
-    // Récupération du nom de l'image
-    imageName := r.URL.Query().Get("image")
+        if imageId != "" {
+            // Appel de l'API OCR
+            ocrData, err := ocr.GetOCRFromId(imageId)
+            if err != nil {
+                log.Panic("Méthode non autorisée")
+                http.Error(w, "Erreur lors de l'appel de l'API OCR", http.StatusInternalServerError)
+                return
+            }
+        
+            jsonData, err := json.Marshal(ocrData)
+            if err != nil {
+                log.Panic("Méthode non autorisée")
+                http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
+                return
+            }
+            log.Print("Extraction complétée")
+        
+            w.Write(jsonData)
+        }else if imageName != "" {
+            // Appel de l'API OCR
+            ocrData, err := ocr.GetOCR(imageName)
+            if err != nil {
+                log.Panic("Méthode non autorisée")
+                http.Error(w, "Erreur lors de l'appel de l'API OCR", http.StatusInternalServerError)
+                return
+            }
+    
+            jsonData, err := json.Marshal(ocrData)
+            if err != nil {
+                log.Panic("Méthode non autorisée")
+                http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
+                return
+            }
+            log.Print("Extraction complétée")
+    
+            w.Write(jsonData)
+        }else {
+            log.Panic("Méthode non autorisée")
+            http.Error(w, "Erreur lors de l'appel de l'API OCR", http.StatusInternalServerError)
+            return
+        }        
+    }else if r.Method == "POST" {
+        // Récupération de l'id de l'image
+        imageId := r.URL.Query().Get("id")
+        // Récupération du nom de l'image
+        input := models.IInput{}
 
-    // Appel de l'API OCR
-    ocrData, err := ocr.GetOCR(imageName)
-    if err != nil {
-        log.Panic("Méthode non autorisée")
-        http.Error(w, "Erreur lors de l'appel de l'API OCR", http.StatusInternalServerError)
-        return
+		// Lecture du corps de la requête
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			log.Panic("Méthode non autorisée")
+			http.Error(w, "Erreur lors de la lecture du corps de la requête", http.StatusInternalServerError)
+			return
+		}
+
+		// Décodage du JSON dans la structure IInput
+		err = json.Unmarshal(body, &input)
+		if err != nil {
+			log.Panic("Méthode non autorisée")
+			http.Error(w, "Erreur lors de la conversion du JSON", http.StatusInternalServerError)
+			return
+		}
+    
+        if imageId != "" {
+            // Appel de l'API OCR
+            ocrData, err := ocr.PostOCRFromId(imageId,input)
+            if err != nil {
+                log.Panic("Méthode non autorisée")
+                http.Error(w, "Erreur lors de l'appel de l'API OCR", http.StatusInternalServerError)
+                return
+            }
+        
+            jsonData, err := json.Marshal(ocrData)
+            if err != nil {
+                log.Panic("Méthode non autorisée")
+                http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
+                return
+            }
+            log.Print("Extraction complétée")
+        
+            w.Write(jsonData)
+        }else {
+            log.Panic("Méthode non autorisée")
+            http.Error(w, "Erreur lors de l'appel de l'API OCR", http.StatusInternalServerError)
+            return
+        }        
+    }else {
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
     }
-
-    jsonData, err := json.Marshal(ocrData)
-    if err != nil {
-        log.Panic("Méthode non autorisée")
-        http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
-        return
-    }
-    log.Print("Extraction complétée")
-
-    w.Write(jsonData)
 }

@@ -15,6 +15,7 @@ import (
 
 func main() {
     router := gin.Default()
+    router.Use(gin.Logger())
 
     REACT_APP_DB_URI, ok := os.LookupEnv("REACT_APP_DB_URI")
     if !ok{
@@ -53,9 +54,12 @@ func main() {
             return
         }
 
+        userId := c.Request.FormValue("userId")
+
+
         // Création de l'objet ImageData avec le chemin de l'image
         imageData := models.ImageData{
-            Iduser: header.IdUser,
+            UserId: userId,
             Name: header.Filename,
             Path: trueName, // Utilisez le chemin de l'image au lieu des données binaires
             ContentType: header.Header.Get("Content-Type"),

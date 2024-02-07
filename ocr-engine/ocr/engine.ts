@@ -17,7 +17,7 @@ export class Engine{
         const { data: { text } } = await this.worker.recognize(imagePath);
         const output:IRecognition = {
             imagePath,
-            content:text
+            fulltext:text
         }
         return output;
     }
@@ -28,7 +28,7 @@ export class Engine{
         
         const output:IRecognition = {
             imagePath,
-            content:text
+            fulltext:text
         }
         return output;
     }

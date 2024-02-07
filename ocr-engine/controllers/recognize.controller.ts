@@ -55,7 +55,7 @@ export class RecognizeController implements ExpressController{
             const name = input.inputs[i].name
             result.push({
                 [name]:{
-                    value:entry.content,
+                    value:entry.fulltext,
                     top:input.inputs[i].rectangle.top,
                     left:input.inputs[i].rectangle.left,
                     width:input.inputs[i].rectangle.width,

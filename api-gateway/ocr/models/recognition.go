@@ -8,7 +8,7 @@ type Recognition struct {
 func Tostring(recognition Recognition)[]string{
 	var str []string
 	str = append(str, recognition.Name)
-	str = append(str, recognition.Content)
+	str = append(str, recognition.FullText)
 	return str
 }
 

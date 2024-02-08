@@ -10,7 +10,7 @@ interface ImageData {
     extractData: string;
 }
 
-const UserImages: React.FC<{}> = () => {
+export const UserImages: React.FC<{}> = () => {
     const [images, setImages] = useState<ImageData[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const userId = "333"; // Remplacez ceci par l'ID réel de l'utilisateur connecté

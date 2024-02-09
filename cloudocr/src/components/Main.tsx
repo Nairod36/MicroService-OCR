@@ -1,9 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { Rectangle } from "./Rectangle";
 import { toast } from "./ui/use-toast";
 import { Toaster } from "./ui/toaster";
 import { InputFile } from "./InputFile";
+import axios from "axios";
+import { IFile } from "../models";
 
 let index = 0;
 const colors = [
@@ -62,8 +64,9 @@ interface Rectangle {
 export const Main = () => {
   const [rectangles, setRectangles] = useState<IRect[]>([]);
   const [imgLoaded,setImgLoaded] = useState(false)
-  const [img,setImg] = useState<{name:string}|null>(null)
+  const [img,setImg] = useState<IFile|null>(null)
   const imageRef = useRef<HTMLDivElement>(null);
+  const [imageId,setImageId] = useState<string>("")
 
   const checkName = (name: string): string => {
     let newName = name;
@@ -93,7 +96,37 @@ export const Main = () => {
 
     return newName;
   };
-  const recognize = () => {
+
+  const uploadImage = async (image:File) => {
+    const formData = new FormData()
+    formData.append('userId', "test")
+    formData.append('image',image)
+    
+    try{
+      const response = await axios.post(`${process.env.REACT_APP_GATEWAY_URI}:${process.env.REACT_APP_GATEWAY_PORT}/upload`,formData)
+      setImageId(response.data)
+    }catch(error){
+      console.error(error)
+    }
+  }
+
+  useEffect(()=>{
+    const fetchImage = async () => {
+      try{
+        const response = await axios.get(`${process.env.REACT_APP_GATEWAY_URI}:${process.env.REACT_APP_GATEWAY_PORT}/image?id=${imageId}`)
+        console.log(response.data);
+        setImg(response.data)
+        setImgLoaded(true)
+      }catch(error){
+        console.error(error)
+      }
+    }
+    if(imageId!=""){
+      fetchImage()
+    }
+  },[imageId])
+
+  const recognize = async () => {
     const input: IInput = {
       inputs: [],
     };
@@ -109,20 +142,36 @@ export const Main = () => {
       };
       input.inputs.push(inputComponent);
     });
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(input, null, 2)}</code>
-        </pre>
-      ),
-    });
-
-    // TODO : Axios.Post(url_du_service)
+    try{
+      const response = await axios.post(`${process.env.REACT_APP_GATEWAY_URI}:${process.env.REACT_APP_GATEWAY_PORT}/ocr?id=${imageId}`,input)
+      toast({
+        title: "You obtained the following values:",
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(response.data, null, 2)}</code>
+          </pre>
+        ),
+      }); 
+    }catch(error){
+      console.error(error)
+    }
+    
   };
 
-  const fulltext = () => {
-    // TODO : Axios.Post(url_du_service)
+  const fulltext = async () => {
+    try{
+      const response = await axios.get(`${process.env.REACT_APP_GATEWAY_URI}:${process.env.REACT_APP_GATEWAY_PORT}/ocr?id=${imageId}`)
+      toast({
+        title: "You obtained the following values:",
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(response.data, null, 2)}</code>
+          </pre>
+        ),
+      }); 
+    }catch(error){
+      console.error(error)
+    }
   };
 
   const handleDestruct = () => {
@@ -189,7 +238,7 @@ export const Main = () => {
             />
             <div className="flex flex-col gap-10 items-center justify-center">
               <h1 className="font-semibold text-lg md:text-2xl text-center">
-                {imgLoaded && img ? img.name : "Product Name"}
+                {imgLoaded && img ? img.Name : "Product Name"}
               </h1>
               <div
                 ref={imageRef}
@@ -200,14 +249,14 @@ export const Main = () => {
                 {imgLoaded ?
                 <img
                 className="rounded-lg"
-                src="./test.png"
+                src={`${process.env.REACT_APP_SAVE_IMG_URI}:${process.env.REACT_APP_SAVE_IMG_PORT}/images/${img?.Path}`}
                 width={1000}
                 style={{
                   objectFit: "cover",
                 }}
               />
                 :
-                <InputFile setImage={setImg} imageUploaded={setImgLoaded}/>
+                <InputFile uploadImage={uploadImage}/>
                 }
                 
                 {rectangles.map((r) => (

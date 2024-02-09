@@ -3,8 +3,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 export interface IInputFileEntry {
-  imageUploaded: (state:boolean) => void;
-  setImage:(file:{name:string})=>void
+  uploadImage:(file:File)=>void
 }
 
 export const InputFile = (props: IInputFileEntry) => {
@@ -15,8 +14,7 @@ export const InputFile = (props: IInputFileEntry) => {
   const handleFileChange = (event: { target: any }) => {
     const uploadedFile = event.target.files[0];
     if (uploadedFile) {
-      props.imageUploaded(true);
-      props.setImage(event.target.files[0])
+      props.uploadImage(uploadedFile)
       setFile(uploadedFile);
     }
   };

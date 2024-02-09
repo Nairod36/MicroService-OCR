@@ -26,7 +26,7 @@ const LoginForm: React.FC = () => {
     //         console.log(response.data); // Traiter la réponse de l'API
 
     //         // Si la connexion est réussie, rediriger vers la page d'upload
-            navigate('/upload');
+            navigate('/recognize');
     //     } catch (error) {
     //         console.error('Erreur lors de la connexion', error);
     //         // Gérer l'erreur de connexion ici

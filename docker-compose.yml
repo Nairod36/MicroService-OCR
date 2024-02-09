@@ -56,5 +56,15 @@ services:
     ports:
       - ${REACT_APP_AUTH_USER_PORT}:${REACT_APP_AUTH_USER_PORT}
 
+  cloudocr:
+    build:
+      context: .
+      dockerfile: ./cloudocr/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:80"
+
+
 volumes:
   mongodb_data:

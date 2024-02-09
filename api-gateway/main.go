@@ -28,7 +28,8 @@ func main() {
 
 	log.Print("Server start...")
 	http.HandleFunc("/auth", authHandler)
-    http.HandleFunc("/image", imageUploadHandler)
+    http.HandleFunc("/upload", imageUploadHandler)
+    http.HandleFunc("/image", imageDownloadHandler)
     http.HandleFunc("/ocr", ocrHandler)
 
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -43,6 +44,11 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
+    // TODO : SUPPRIMER POUR PROD
+    // Set CORS headers
+    w.Header().Set("Access-Control-Allow-Origin", "*") // or specify your domain
+    w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+    w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
 
 	file, header, err := r.FormFile("image")
 	if err != nil {
@@ -53,19 +59,67 @@ func imageUploadHandler(w http.ResponseWriter, r *http.Request) {
 
     userId := r.FormValue("userId")
 
-	_,err = img.SendImageToAPI(file, userId, header)
+	imageId,err := img.SendImageToAPI(file, userId, header)
 	if err != nil {
 		http.Error(w, "Failed to send image to API: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Image uploaded successfully"))
+	w.Write([]byte(imageId))
+}
+
+func imageDownloadHandler(w http.ResponseWriter, r *http.Request){
+    // TODO : SUPPRIMER POUR PROD
+    // Set CORS headers
+    w.Header().Set("Access-Control-Allow-Origin", "*") // or specify your domain
+    w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+    w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+	if r.Method == "GET" {
+        // Récupération de l'id de l'image
+        imageId := r.URL.Query().Get("id")
+    
+        if imageId != "" {
+            // Appel de l'API saveIMG
+            imgData, err := img.GetImageFromId(imageId)
+            if err != nil {
+                log.Panic("Méthode non autorisée")
+                http.Error(w, "Erreur lors de l'appel de l'API saveIMG", http.StatusInternalServerError)
+                return
+            }
+        
+            jsonData, err := json.Marshal(imgData)
+            if err != nil {
+                log.Panic("Méthode non autorisée")
+                http.Error(w, "Erreur lors de la conversion en JSON", http.StatusInternalServerError)
+                return
+            }
+            log.Print("Extraction complétée")
+        
+            w.Write(jsonData)
+        }else {
+            log.Panic("Méthode non autorisée")
+            http.Error(w, "Erreur lors de l'appel de l'API saveIMG", http.StatusInternalServerError)
+            return
+        } 
+    }
 }
 
 
 func ocrHandler(w http.ResponseWriter, r *http.Request) {
-    // Logique pour OCR
+    // TODO : SUPPRIMER POUR PROD
+    // Set CORS headers
+    w.Header().Set("Access-Control-Allow-Origin", "*") // or specify your domain
+    w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+    w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+    if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	// Logique pour OCR
     if r.Method == "GET" {
         // Récupération de l'id de l'image
         imageId := r.URL.Query().Get("id")

@@ -1,14 +1,40 @@
 import React, { useState } from 'react';
 import { TextField, Button, Paper, Box, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+
 
 const LoginForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // Logique de connexion ici
-        console.log(email, password);
+
+        const uri = process.env.REACT_APP_AUTH_USER_URI;
+        const port = process.env.REACT_APP_AUTH_USER_PORT;
+        const apiUrl = `${uri}:${port}/login`;
+
+    //     try {
+    //         const response = await axios.post(apiUrl, {
+    //             email: email,
+    //             password: password
+    //         });
+
+    //         console.log(response.data); // Traiter la réponse de l'API
+
+    //         // Si la connexion est réussie, rediriger vers la page d'upload
+            navigate('/recognize');
+    //     } catch (error) {
+    //         console.error('Erreur lors de la connexion', error);
+    //         // Gérer l'erreur de connexion ici
+    //     }
+    };
+    
+    const handleRegisterRedirect = () => {
+        navigate('/register'); 
     };
 
     return (
@@ -40,6 +66,14 @@ const LoginForm: React.FC = () => {
                     Se connecter
                 </Button>
             </form>
+            <Box marginTop={2} marginBottom={2}>
+                <Typography variant="body2" style={{ textAlign: 'center' }}>
+                    Pas de compte ?
+                </Typography>
+            </Box>
+            <Button onClick={handleRegisterRedirect} fullWidth variant="outlined" color="primary">
+                S'inscrire
+            </Button>
         </Paper>
     );
 };

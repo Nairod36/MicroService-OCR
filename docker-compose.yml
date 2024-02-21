@@ -1,0 +1,70 @@
+version: '3.5'
+
+services:
+
+  gateway:   
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+      platforms: 
+        - "linux/amd64"
+    env_file:
+      - .env
+    volumes:
+      - "./api-gateway/logs:/logs"
+    ports:
+      - ${REACT_APP_GATEWAY_PORT}:${REACT_APP_GATEWAY_PORT}
+  
+  ocr-engine:   
+    build:
+      context: .
+      dockerfile: ./ocr-engine/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - ${REACT_APP_OCR_ENGINE_PORT}:${REACT_APP_OCR_ENGINE_PORT}
+    volumes:
+      - ./ocr-engine/images:/app/images
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${REACT_APP_DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${REACT_APP_DB_SECRET}
+    volumes:
+      - mongodb_data:/data/db
+  
+  save-img:   
+    build:
+      context: .
+      dockerfile: ./saveIMG/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - ${REACT_APP_SAVE_IMG_PORT}:${REACT_APP_SAVE_IMG_PORT}
+    volumes:
+      - ./saveIMG/images:/images
+
+  auth-user:
+    build:
+      context: .
+      dockerfile: ./auth/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - ${REACT_APP_AUTH_USER_PORT}:${REACT_APP_AUTH_USER_PORT}
+
+  cloudocr:
+    build:
+      context: .
+      dockerfile: ./cloudocr/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8080:80"
+
+
+volumes:
+  mongodb_data:

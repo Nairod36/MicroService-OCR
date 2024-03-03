@@ -11,6 +11,8 @@ import (
 	"net/http"
 	"os"
 	"time"
+    "bytes"
+    "strings"
 )
 
 type ApiResponse struct {
@@ -35,8 +37,9 @@ func main() {
 
 	log.Print("Server start...")
 	http.HandleFunc("/auth", authHandler)
-  http.HandleFunc("/image", jwtMiddleware(imageUploadHandler))
-  http.HandleFunc("/ocr", jwtMiddleware(ocrHandler))
+    http.HandleFunc("/image", jwtMiddleware(imageUploadHandler))
+    http.HandleFunc("/ocr", jwtMiddleware(ocrHandler))
+    http.HandleFunc("/upload", jwtMiddleware(imageUploadHandler))
 
 
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +73,7 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // Création et envoi de la requête à l'API d'authentification
-    req, err := http.NewRequest("POST", "http://localhost:8080/login", bytes.NewBuffer(jsonBody))
+    req, err := http.NewRequest("POST", "http://localhost:80/login", bytes.NewBuffer(jsonBody))
     req.Header.Set("Content-Type", "application/json")
 
     client := &http.Client{}

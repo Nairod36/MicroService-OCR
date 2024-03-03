@@ -51,10 +51,24 @@ services:
     build:
       context: .
       dockerfile: ./auth/Dockerfile
-    env_file:
-      - .env
+    environment:
+      - JWT_SECRET=TESTSECRETkey
+      - MONGO_URI=mongodb://mongoadmin:secret@auth-mongo:27017
     ports:
       - ${REACT_APP_AUTH_USER_PORT}:${REACT_APP_AUTH_USER_PORT}
+    depends_on:
+      - auth-mongo
+
+  auth-mongo:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      - JWT_SECRET=TESTSECRETkey
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+      - MONGO_INITDB_ROOT_PASSWORD=secret
 
   cloudocr:
     build:
@@ -63,8 +77,9 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:80"
+      - "8081:80"
 
 
 volumes:
   mongodb_data:
+  mongo-data:
